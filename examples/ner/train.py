@@ -114,7 +114,7 @@ if __name__ == '__main__':
     conll_cb = ConllCallback(x_test, y_test, dataset.y_labels,
                              batch_size=args.b)
 
-    ner_model.fit(x=x_train , y=y_train,
+    ner_model.fit(x=x_train, y=y_train,
                   batch_size=args.b,
                   epochs=args.e,
                   callbacks=[conll_cb],
