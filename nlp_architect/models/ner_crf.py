@@ -174,3 +174,4 @@ class NERCRF(object):
             path (str): path to load model from
         """
         save_load_utils.load_all_weights(self.model, path, include_optimizer=False)
+        print('testing model:', self.model.predict(np.zeros((1, 30))))

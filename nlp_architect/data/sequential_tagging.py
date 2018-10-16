@@ -17,7 +17,7 @@
 from __future__ import division, print_function, unicode_literals, absolute_import
 
 from os import path
-
+import copy
 import numpy as np
 from keras.preprocessing.sequence import pad_sequences
 
@@ -271,3 +271,14 @@ class CONLL2000(object):
             chars_vecs = zeros.astype(dtype=np.int32)
             self._data_dict['train'] += (chars_vecs[:train_size],)
             self._data_dict['test'] += (chars_vecs[-test_size:],)
+
+
+class GenFL(object):
+    
+    def __init__(self):
+        pass
+
+
+    
+    
+    

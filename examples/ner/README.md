@@ -18,7 +18,7 @@ In this example, a `name`, `city` and `date` entities are identified.
 Train a model with default parameters given input data files:
 
 ```
-python train.py --train_file train.txt --test_file test.txt
+python3 examples/ner/train.py --train_file datasets/ner/wordtag.txt --test_file datasets/ner/wordtag.txt 
 ```
 
 ## Interactive mode
