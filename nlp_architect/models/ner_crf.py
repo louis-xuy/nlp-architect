@@ -21,12 +21,11 @@ from __future__ import absolute_import
 
 import numpy as np
 from keras import Input, Model
-from keras.layers import Embedding, Dropout, TimeDistributed, Bidirectional, LSTM, concatenate, \
-    Dense
+from keras.layers import Embedding, Dropout, Bidirectional, LSTM, Dense
 from keras_contrib.layers import CRF
 from keras_contrib.utils import save_load_utils
 
-from nlp_architect.utils.embedding import load_word_embeddings
+from nlp_architect.data.embedding import load_word_embeddings
 
 
 class NERCRF(object):
