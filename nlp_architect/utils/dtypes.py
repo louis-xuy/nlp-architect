@@ -57,6 +57,11 @@ def get_tf_dtype(dtype): # pylint: disable=too-many-return-statements
         return tf.bool
     elif dtype in {'string', 'str', 'tf.string', str, np.str, tf.string}:
         return tf.string
+    # try:
+    #     if dtype == {'unicode', }:
+    #         return tf.string
+    # except NameError:
+    #     pass
 
     raise ValueError(
         "Unsupported conversion from type {} to tf dtype".format(str(dtype)))

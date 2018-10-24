@@ -11,9 +11,9 @@ import os
 import pickle
 import jieba
 import numpy as np
-from os import path, makedirs, sys
 import tensorflow as tf
 from nlp_architect.utils.text import Vocabulary
+from os import path, makedirs, sys
 from nlp_architect.api.abstract_api import AbstractApi
 from nlp_architect.models.gen_char_rnn import CharRNN
 
@@ -45,6 +45,7 @@ class WordLanguageApi(AbstractApi):
                                 n_layers=self.model_info['n_layers'],
                                 embedding=self.model_info['embedding'],
                                 embedding_size=self.model_info['embedding_size']
+    
                         )
     
         self.model.load(checkpoint_path)

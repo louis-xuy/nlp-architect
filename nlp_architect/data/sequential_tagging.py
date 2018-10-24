@@ -14,10 +14,9 @@
 # limitations under the License.
 # ******************************************************************************
 
-from __future__ import division, print_function, unicode_literals, absolute_import
 
 from os import path
-import copy
+import collections
 import numpy as np
 from keras.preprocessing.sequence import pad_sequences
 
@@ -26,6 +25,122 @@ from nlp_architect.utils.io import validate_existing_directory, validate_existin
 from nlp_architect.utils.text import Vocabulary, read_sequential_tagging_file, \
     word_vector_generator, character_vector_generator
 
+
+class BosonCN(object):
+    """
+    Sequential tagging dataset loader.
+    Loads train/test files with tabular separation.
+
+    Args:
+        train_file (str): path to train file
+        test_file (str): path to test file
+        max_sentence_length (int, optional): max sentence length
+        max_word_length (int, optional): max word length
+        tag_field_no (int, optional): index of column to use a y-samples
+    """
+
+    def __init__(self,
+                 train_file,
+                 test_file,
+                 max_sentence_length=30,
+                 max_word_length=20,
+                 tag_field_no=2):
+        self.files = {'train': train_file,
+                      'test': test_file}
+        self.max_sent_len = max_sentence_length
+        self.max_word_len = max_word_length
+        self.tf = tag_field_no
+
+        self.vocabs = {'token': Vocabulary(2),  # 0=pad, 1=unk
+                       'tag': Vocabulary(1)}    # 0=pad
+
+        self.data = {}
+        for f in self.files:
+            raw_sentences = self._read_file(self.files[f])
+            word_vecs = []
+            tag_vecs = []
+            for tokens, tags in raw_sentences:
+                print (tokens, tags)
+                word_vecs.append(np.array([self.vocabs['token'].add(t) for t in tokens]))
+                tag_vecs.append(np.array([self.vocabs['tag'].add(t) for t in tags]))
+            word_vecs = pad_sequences(word_vecs, maxlen=self.max_sent_len)
+            tag_vecs = pad_sequences(tag_vecs, maxlen=self.max_sent_len)
+            self.data[f] = word_vecs, tag_vecs
+
+    @property
+    def y_labels(self):
+        """return y labels"""
+        return self.vocabs['tag'].vocab
+
+    @property
+    def word_vocab(self):
+        """words vocabulary"""
+        return self.vocabs['token'].vocab
+
+    @property
+    def char_vocab(self):
+        """characters vocabulary"""
+        return self.vocabs['char'].vocab
+
+    @property
+    def word_vocab_size(self):
+        """word vocabulary size"""
+        return len(self.vocabs['token']) + 2
+
+    @property
+    def char_vocab_size(self):
+        """character vocabulary size"""
+        return len(self.vocabs['char']) + 2
+
+    @property
+    def train(self):
+        """Get the train set"""
+        return self.data['train']
+
+    @property
+    def test(self):
+        """Get the test set"""
+        return self.data['test']
+
+    def _read_file(self, filepath):
+        with open(filepath, encoding='utf-8') as fp:
+            data = fp.readlines()
+            data = [d.strip() for d in data]
+            data = [d for d in data if 'DOCSTART' not in d]
+            sentences = self._split_into_sentences(data)
+            parsed_sentences = [self._parse_sentence(s) for s in sentences if len(s) > 0]
+        return parsed_sentences
+
+    def _parse_sentence(self, sentence):
+        tokens = []
+        tags = []
+        for line in sentence:
+            fields = line.split(' ')
+            for field in fields:
+                field = field.split('/')
+                print (field)
+                print (self.tf)
+                assert len(field) >= self.tf, 'tag field exceeds number of fields'
+                if 'CD' in field[1]:
+                    tokens.append('0')
+                else:
+                    tokens.append(field[0])
+                tags.append(field[self.tf - 1])
+        return tokens, tags
+
+    @staticmethod
+    def _split_into_sentences(file_lines):
+        sents = []
+        s = []
+        for line in file_lines:
+            line = line.strip()
+            if not line:
+                sents.append(s)
+                s = []
+                continue
+            s.append(line)
+        sents.append(s)
+        return sents
 
 class SequentialTaggingDataset(object):
     """
@@ -273,12 +388,68 @@ class CONLL2000(object):
             self._data_dict['test'] += (chars_vecs[-test_size:],)
 
 
-class GenFL(object):
+
+class FLArticle():
+    
+    
+    
+    dataset_files = {'train': 'train.txt',
+                     'test': 'test.txt'}
     
     def __init__(self):
-        pass
+        self.start_token = 'B'
+        self.end_token = 'E'
+        self._data_dict = {}
+    
+    def gen_data(self, file_name):
+        # poems -> list of numbers
+        datas = []
+        with open(file_name, "r", encoding='utf-8', ) as f:
+            for line in f.readlines():
+                try:
+                    content = line.strip()
+                    content = content.replace(' ', '')
+                    if '_' in content or '(' in content or '（' in content or '《' in content or '[' in content or \
+                            self.start_token in content or self.end_token in content:
+                        continue
+                    if len(content) < 5 or len(content) > 100:
+                        continue
+                    content = self.start_token + content + self.end_token
+                    datas.append(content)
+                except ValueError as e:
+                    pass
+                
+        all_words = [word for data in datas for word in data]
+        counter = collections.Counter(all_words)
+        count_pairs = sorted(counter.items(), key=lambda x: x[1], reverse=True)
+        words, _ = zip(*count_pairs)
 
+        words = words + (' ',)
+        word_int_map = dict(zip(words, range(len(words))))
+        datas_vector = [list(map(lambda word: word_int_map.get(word, len(words)), data)) for data in datas]
 
-    
-    
-    
+        return datas_vector, word_int_map, words
+
+    def generate_batch(self, batch_size, poems_vec, word_to_int):
+        n_chunk = len(poems_vec) // batch_size
+        x_batches = []
+        y_batches = []
+        for i in range(n_chunk):
+            start_index = i * batch_size
+            end_index = start_index + batch_size
+        
+            batches = poems_vec[start_index:end_index]
+            length = max(map(len, batches))
+            x_data = np.full((batch_size, length), word_to_int[' '], np.int32)
+            for row, batch in enumerate(batches):
+                x_data[row, :len(batch)] = batch
+            y_data = np.copy(x_data)
+            y_data[:, :-1] = x_data[:, 1:]
+            """
+            x_data             y_data
+            [6,2,4,6,9]       [2,4,6,9,9]
+            [1,4,2,8,5]       [4,2,8,5,5]
+            """
+            x_batches.append(x_data)
+            y_batches.append(y_data)
+        return x_batches, y_batches
