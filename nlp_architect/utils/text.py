@@ -15,6 +15,7 @@
 # ******************************************************************************
 import sys
 import re
+import pickle
 
 import spacy
 from spacy.cli.download import download as spacy_download
@@ -31,11 +32,17 @@ class Vocabulary:
     A vocabulary that maps words to ints (storing a vocabulary)
     """
 
-    def __init__(self, start=0):
-
-        self._vocab = {}
-        self._rev_vocab = {}
-        self.next = start
+    def __init__(self, start=0, vocab_path=None):
+        if vocab_path is not None:
+            with open(vocab_path, 'rb') as f:
+                self._vocab = pickle.load(f)
+            self._rev_vocab = {v: k for k, v in self._vocab.items()}
+            self.next = max(self._vocab.values()) + 1
+            print('Vocabulary is loaded successfully.')
+        else:
+            self._vocab = {}
+            self._rev_vocab = {}
+            self.next = start
 
     def add(self, word):
         """

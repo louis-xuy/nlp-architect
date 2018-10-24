@@ -25,7 +25,7 @@ from tensorflow import keras
 from nlp_architect.contrib.keras.callbacks import ConllCallback
 from nlp_architect.data.sequential_tagging import CONLL2000
 from nlp_architect.models.chunker import SequenceChunker
-from nlp_architect.utils.embedding import load_word_embeddings, get_embedding_matrix
+from nlp_architect.data.embedding import load_word_embeddings, get_embedding_matrix
 from nlp_architect.utils.io import validate_existing_filepath, validate_parent_exists, validate, \
     validate_existing_directory
 from nlp_architect.utils.metrics import get_conll_scores

@@ -21,12 +21,11 @@ from __future__ import absolute_import
 
 import numpy as np
 from keras import Input, Model
-from keras.layers import Embedding, Dropout, TimeDistributed, Bidirectional, LSTM, concatenate, \
-    Dense
+from keras.layers import Embedding, Dropout, Bidirectional, LSTM, Dense
 from keras_contrib.layers import CRF
 from keras_contrib.utils import save_load_utils
 
-from nlp_architect.utils.embedding import load_word_embeddings
+from nlp_architect.data.embedding import load_word_embeddings
 
 
 class NERCRF(object):
@@ -98,18 +97,18 @@ class NERCRF(object):
         word_embeddings = Dropout(dropout)(word_embeddings)
 
         # create word character embeddings
-        word_chars_input = Input(shape=(sentence_length, word_length), name='word_chars_input')
-        char_embedding_layer = Embedding(char_vocab_size, char_embedding_dims,
-                                         input_length=word_length)
-        char_embeddings = TimeDistributed(char_embedding_layer)(word_chars_input)
-        char_embeddings = TimeDistributed(Bidirectional(LSTM(word_lstm_dims)))(char_embeddings)
-        char_embeddings = Dropout(dropout)(char_embeddings)
+        # word_chars_input = Input(shape=(sentence_length, word_length), name='word_chars_input')
+        # char_embedding_layer = Embedding(char_vocab_size, char_embedding_dims,
+        #                                  input_length=word_length)
+        # char_embeddings = TimeDistributed(char_embedding_layer)(word_chars_input)
+        # char_embeddings = TimeDistributed(Bidirectional(LSTM(word_lstm_dims)))(char_embeddings)
+        # char_embeddings = Dropout(dropout)(char_embeddings)
 
         # create the final feature vectors
-        features = concatenate([word_embeddings, char_embeddings], axis=-1)
+        #features = concatenate([word_embeddings, char_embeddings], axis=-1)
 
         # encode using a bi-lstm
-        bilstm = Bidirectional(LSTM(tagger_lstm_dims, return_sequences=True))(features)
+        bilstm = Bidirectional(LSTM(tagger_lstm_dims, return_sequences=True))(word_embeddings)
         bilstm = Dropout(dropout)(bilstm)
         after_lstm_hidden = Dense(tagger_fc_dims)(bilstm)
 
@@ -118,7 +117,7 @@ class NERCRF(object):
         predictions = crf(after_lstm_hidden)
 
         # compile the model
-        model = Model(inputs=[words_input, word_chars_input], outputs=predictions)
+        model = Model(inputs=words_input, outputs=predictions)
         model.compile(loss=crf.loss_function,
                       optimizer='adam',
                       metrics=[crf.accuracy])
@@ -138,6 +137,7 @@ class NERCRF(object):
                 to be evaluated when training
         """
         assert self.model, 'Model was not initialized'
+        print (x)
         self.model.fit(x, y, epochs=epochs, batch_size=batch_size, shuffle=True,
                        validation_data=validation,
                        callbacks=callbacks)
@@ -173,3 +173,4 @@ class NERCRF(object):
             path (str): path to load model from
         """
         save_load_utils.load_all_weights(self.model, path, include_optimizer=False)
+        print('testing model:', self.model.predict(np.zeros((1, 30))))

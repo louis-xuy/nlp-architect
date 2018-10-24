@@ -22,7 +22,7 @@ from builtins import input
 import numpy as np
 from nlp_architect.data.intent_datasets import SNIPS
 from nlp_architect.models.intent_extraction import IntentExtractionModel
-from nlp_architect.utils.embedding import load_word_embeddings
+from nlp_architect.data.embedding import load_word_embeddings
 from nlp_architect.utils.io import validate_existing_filepath, validate, \
     validate_existing_directory
 from nlp_architect.utils.text import SpacyInstance
