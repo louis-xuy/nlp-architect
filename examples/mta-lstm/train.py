@@ -14,7 +14,7 @@ except:
 config_tf = tf.ConfigProto()
 config_tf.gpu_options.allow_growth = True
 
-total_step = 624  # get value from output of Preprocess.py file
+total_step = 61  # get value from output of Preprocess.py file
 
 config = config.Config()
 

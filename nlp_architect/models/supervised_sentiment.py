@@ -18,7 +18,7 @@ from keras.models import Sequential
 from keras.layers import Dense, Embedding, LSTM, Activation, Dropout, Flatten, Bidirectional
 from keras.layers.convolutional import Conv1D, MaxPooling1D
 from keras.optimizers import SGD
-
+from keras_contrib.utils import save_load_utils
 
 def simple_lstm(max_fatures, dense_out, input_length, embed_dim=256, lstm_out=140,
                 dropout=0.5):
@@ -121,3 +121,66 @@ def one_hot_cnn(dense_out, max_len=300, frame='small'):
     model.compile(loss='categorical_crossentropy', optimizer=sgd, metrics=['accuracy'])
 
     return model
+
+class SentimentLSTM(object):
+    
+    def __init__(self):
+        self.model = None
+    
+    def build(self, max_fatures,
+              dense_out,
+              input_length,
+              embed_dim=256,
+              lstm_out=140,
+                dropout=0.5):
+        """
+            Simple Bi-direction LSTM Model in Keras
+
+            Single layer bi-directional lstm with recurrent dropout and a fully connected layer
+
+            Args:
+                max_features (int): vocabulary size
+                dense_out (int): size out the output dense layer, this is the number of classes
+                input_length (int): length of the input text
+                embed_dim (int): internal embedding size used in the lstm
+                lstm_out (int): size of the bi-directional output layer
+                dropout (float): value for recurrent dropout, between 0 and 1
+
+            Returns:
+                model (model): LSTM model
+            """
+        model = Sequential()
+        model.add(Embedding(max_fatures, embed_dim, input_length=input_length))
+        model.add(Bidirectional(LSTM(lstm_out, recurrent_dropout=dropout, activation='tanh')))
+        model.add(Dense(dense_out, activation='softmax'))
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    
+        return model
+    
+    def fit(self, x, y, epochs=1, batch_size=1, callbacks=None, validation=None):
+        assert self.model, 'Model was not initialized'
+        self.model.fit(x, y, epochs=epochs, batch_size=batch_size, shuffle=True,
+                       validation_data=validation,
+                       callbacks=callbacks)
+        
+    def predict(self, x, batch_size=1):
+        assert self.model, 'Model was not initialized'
+        return self.model.predict(x, batch_size=batch_size)
+    
+    def save(self, path):
+        """
+        Save model to path
+
+        Args:
+            path (str): path to save model weights
+        """
+        save_load_utils.save_all_weights(self.model, path)
+        
+    def load(self, path):
+        """
+        
+        :param path:
+        :return:
+        """
+        save_load_utils.load_all_weights(self.model, path, include_optimizer=False)
+        print('testing model:', self.model.predict(np.zeros((1, 30))))
