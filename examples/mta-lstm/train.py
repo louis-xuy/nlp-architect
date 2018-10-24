@@ -12,7 +12,8 @@ except:
     pass
 
 config_tf = tf.ConfigProto()
-config_tf.gpu_options.allow_growth = True
+config_tf.allow_soft_placement=True
+config_tf.log_device_placement=True
 
 total_step = 61  # get value from output of Preprocess.py file
 
