@@ -15,6 +15,8 @@ config_tf = tf.ConfigProto()
 config_tf.allow_soft_placement=True
 config_tf.log_device_placement=True
 
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+
 total_step = 61  # get value from output of Preprocess.py file
 
 config = config.Config()
@@ -68,18 +70,20 @@ class Model(object):
         #     LSTM_cell = tf.nn.rnn_cell.DropoutWrapper(
         #         LSTM_cell, output_keep_prob=config.keep_prob)
         # cell = tf.nn.rnn_cell.MultiRNNCell([LSTM_cell] * config.num_layers, state_is_tuple=False)
-        def create_LSTM_cell():
-            LSTM_cell = tf.nn.rnn_cell.LSTMCell(size, forget_bias=0.0, state_is_tuple=False)
+        with tf.device("/gpu:0"):
+            
+            def create_LSTM_cell():
+                LSTM_cell = tf.nn.rnn_cell.LSTMCell(size, forget_bias=0.0, state_is_tuple=False)
 
-            if is_training and config.keep_prob < 1:
-                LSTM_cell = tf.nn.rnn_cell.DropoutWrapper(
-                    LSTM_cell, output_keep_prob=config.keep_prob)
-            return LSTM_cell
-        # tensorflow 1.4.0需要修改 ！！！
-        layers = [create_LSTM_cell() for _ in range(config.num_layers)]
-        cell = tf.nn.rnn_cell.MultiRNNCell(layers, state_is_tuple=False)
+                if is_training and config.keep_prob < 1:
+                    LSTM_cell = tf.nn.rnn_cell.DropoutWrapper(
+                        LSTM_cell, output_keep_prob=config.keep_prob)
+                return LSTM_cell
+            # tensorflow 1.4.0需要修改 ！！！
+            layers = [create_LSTM_cell() for _ in range(config.num_layers)]
+            cell = tf.nn.rnn_cell.MultiRNNCell(layers, state_is_tuple=False)
         
-        self._initial_state = cell.zero_state(batch_size, tf.float32)
+            self._initial_state = cell.zero_state(batch_size, tf.float32)
         
         with tf.device("/cpu:0"):
             embedding = tf.get_variable('word_embedding', [vocab_size, config.word_embedding_size], trainable=True,
