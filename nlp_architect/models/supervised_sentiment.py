@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ******************************************************************************
-
+import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Embedding, LSTM, Activation, Dropout, Flatten, Bidirectional
 from keras.layers.convolutional import Conv1D, MaxPooling1D

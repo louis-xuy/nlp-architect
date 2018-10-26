@@ -37,7 +37,6 @@ import numpy as np
 
 import tensorflow as tf
 
-from nlp_architect.hyperparams import HParams
 from nlp_architect.utils.dtypes import is_str, is_callable, compat_as_text, \
         _maybe_list_to_array
 
@@ -398,27 +397,6 @@ def call_function_with_redundant_kwargs(fn, kwargs):
     return fn(**selected_kwargs)
 
 
-def get_instance_kwargs(kwargs, hparams):
-    """Makes a dict of keyword arguments with the following structure:
-    `kwargs_ = {'hparams': dict(hparams), **kwargs}`.
-    This is typically used for constructing a module which takes a set of
-    arguments as well as a argument named `hparams`.
-    Args:
-        kwargs (dict): A dict of keyword arguments. Can be `None`.
-        hparams: A dict or an instance of :class:`~texar.HParams` Can be `None`.
-    Returns:
-        A `dict` that contains the keyword arguments in :attr:`kwargs`, and
-        an additional keyword argument named `hparams`.
-    """
-    if hparams is None or isinstance(hparams, dict):
-        kwargs_ = {'hparams': hparams}
-    elif isinstance(hparams, HParams):
-        kwargs_ = {'hparams': hparams.todict()}
-    else:
-        raise ValueError(
-            '`hparams` must be a dict, an instance of HParams, or a `None`.')
-    kwargs_.update(kwargs or {})
-    return kwargs_
 
 def dict_patch(tgt_dict, src_dict):
     """Recursively patch :attr:`tgt_dict` by adding items from :attr:`src_dict`
@@ -457,29 +435,6 @@ def dict_lookup(dict_, keys, default=None):
     """
     return np.vectorize(lambda x: dict_.get(x, default))(keys)
 
-def dict_fetch(src_dict, tgt_dict_or_keys):
-    """Fetches a sub dict of :attr:`src_dict` with the keys in
-    :attr:`tgt_dict_or_keys`.
-    Args:
-        src_dict: A dict or instance of :class:`~texar.HParams`.
-            The source dict to fetch values from.
-        tgt_dict_or_keys: A dict, instance of :class:`~texar.HParams`,
-            or a list (or a dict_keys) of keys to be included in the output
-            dict.
-    Returns:
-        A new dict that is a subdict of :attr:`src_dict`.
-    """
-    if src_dict is None:
-        return src_dict
-
-    if isinstance(tgt_dict_or_keys, HParams):
-        tgt_dict_or_keys = tgt_dict_or_keys.todict()
-    if isinstance(tgt_dict_or_keys, dict):
-        tgt_dict_or_keys = tgt_dict_or_keys.keys()
-    keys = list(tgt_dict_or_keys)
-
-    if isinstance(src_dict, HParams):
-        src_dict = src_dict.todict()
 
     return {k: src_dict[k] for k in keys if k in src_dict}
 

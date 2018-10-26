@@ -16,7 +16,7 @@
 
 const api = '/inference';
 const models = [
-    { name: 'pos', description: '词法类API'},
+    { name: 'jieba_pos', description: '词法类API'},
     { name: 'ner', description: '实体识别API'},
     //{ name: 'spacy_ner', description: 'Name Entity Recognition using spacy',},
     //{ name: 'bist', description: 'BIST Dependency Parser'},

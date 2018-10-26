@@ -27,7 +27,7 @@ api = hug.API(__name__)
 
 
 def prefetchModels():
-    models = ['bist', 'spacy_ner', 'ner', 'jieba_pos', 'word_language']
+    models = ['bist', 'spacy_ner', 'ner', 'jieba_pos']
     for model in models:
         services[model] = Service(model)
 

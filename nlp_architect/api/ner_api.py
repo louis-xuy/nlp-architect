@@ -94,14 +94,10 @@ class NerApi(AbstractApi):
             self.model = NERCRF()
             self.model.build(
                 self.model_info['sentence_len'],
-                self.model_info['word_len'],
                 self.model_info['num_of_labels'],
                 self.model_info['word_vocab'],
                 self.model_info['vocab_size'],
-                self.model_info['char_vocab_size'],
                 word_embedding_dims=self.model_info['word_embedding_dims'],
-                char_embedding_dims=self.model_info['char_embedding_dims'],
-                word_lstm_dims=self.model_info['word_lstm_dims'],
                 tagger_lstm_dims=self.model_info['tagger_lstm_dims'],
                 dropout=self.model_info['dropout'],
                 external_embedding_model=self.model_info[

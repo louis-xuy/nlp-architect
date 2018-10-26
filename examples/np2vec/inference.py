@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ******************************************************************************
+import random
 import argparse
 import logging
 import sys
@@ -64,5 +65,9 @@ if __name__ == "__main__":
         binary=args.binary,
         word_ngrams=args.word_ngrams)
 
-    print("word vector for the NP \'" + args.np + "\':", np2vec_model[args.mark_char.join(
-        args.np.split()) + args.mark_char])
+    # print("word vector for the NP \'" + args.np + "\':", np2vec_model[args.mark_char.join(
+    #    args.np.split()) + args.mark_char])
+    
+    result = np2vec_model.similar_by_word(args.np, 10)
+    slice = random.sample(result, 3)
+    print (''.join([t[0] for t in slice]))

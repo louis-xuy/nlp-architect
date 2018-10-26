@@ -3,6 +3,6 @@
   "bist" : {"file_name": "bist_parser_api.py", "type": "core", "spacy": true},
   "spacy_ner" : {"file_name": "spacy_ner_api.py", "type": "high_level", "spacy": true},
   "ner" : {"file_name": "ner_api.py", "type": "high_level"},
-  "pos": {"file_name": "jieba_pos_api.py", "type": "high_level"},
+  "jieba_pos": {"file_name": "jieba_pos_api.py", "type": "high_level"},
   "gen": {"file_name": "word_language_api.py", "type": "high_level"}
 }
