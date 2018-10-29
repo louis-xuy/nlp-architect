@@ -24,6 +24,8 @@ from nlp_architect.utils.io import validate_existing_filepath, check_size
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+ouf = open('result.csv', 'w', encoding="utf-8")
+
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument(
@@ -68,6 +70,87 @@ if __name__ == "__main__":
     # print("word vector for the NP \'" + args.np + "\':", np2vec_model[args.mark_char.join(
     #    args.np.split()) + args.mark_char])
     
-    result = np2vec_model.similar_by_word(args.np, 10)
-    slice = random.sample(result, 3)
-    print (''.join([t[0] for t in slice]))
+    
+    arr = [
+    '全新',
+    '斗山',
+    '60 - 7',
+    '挖掘机',
+    '野马',
+    'T70',
+    '1.8',
+    'T',
+    '无级',
+    '升级版进取',
+    '大众',
+    'POLO',
+    'Cross',
+    '北京',
+    '旗岭',
+    '箱货',
+    '4.3',
+    '米',
+    '大箱',
+    '解放',
+    '半挂车',
+    '国6',
+    '国5',
+    '国4',
+    '国六',
+    '国五',
+    '国四',
+    '奥迪A4',
+    '豪华型',
+    '起亚K2',
+    'K2',
+    '自动',
+    '抵押车',
+    '仓库',
+    '批发',
+    '一手',
+    '安全',
+    '正规',
+    '招中介',
+    '常年',
+    '收售',
+    '二手',
+    '农机',
+    '原装',
+    '进口',
+    '日立240 - 3',
+    '日立',
+    '挖掘机',
+    '单位',
+    '低价',
+    '处理',
+    '7',
+    '吨',
+    '10',
+    '吨',
+    '叉车',
+    '转让',
+    '东风',
+    '天龙',
+    '前四后四',
+    '载货车',
+    '220',
+    '马',
+    '马力',
+    '9.6',
+    '米厢',
+    '华菱',
+    '高配',
+    '后八轮',
+    '便宜卖'
+    ]
+    for keyword in arr:
+        try:
+            result = np2vec_model.similar_by_word(keyword, 20)
+            ouf.write("{}, {}\n".format(keyword, '--'))
+        except Exception as e:
+            print(e)
+            continue
+        for _ in range(10):
+            slice = random.sample(result, 4)
+            ouf.write("{}, {}\n".format("", ''.join([t[0] for t in slice])))
+    ouf.close()
