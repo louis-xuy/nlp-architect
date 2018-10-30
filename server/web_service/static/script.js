@@ -21,7 +21,8 @@ const models = [
     //{ name: 'spacy_ner', description: 'Name Entity Recognition using spacy',},
     //{ name: 'bist', description: 'BIST Dependency Parser'},
     { name: 'gen', description: '自动生成文本API'},
-    { name: 'sentiment_classify', description: '情感分析API'}
+    { name: 'sentiment_classify', description: '情感分析API'},
+    { name: 'word2vec', description: '测试方法'}
 ];
 
 let annotateForm = document.getElementById('annotateForm');
