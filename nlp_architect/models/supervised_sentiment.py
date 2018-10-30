@@ -155,11 +155,12 @@ class SentimentLSTM(object):
         model.add(Dense(dense_out, activation='softmax'))
         model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     
-        return model
+        self.model = model
     
-    def fit(self, x, y, epochs=1, batch_size=1, callbacks=None, validation=None):
+    def fit(self, x, y, epochs=1, batch_size=1, verbose=1, callbacks=None, validation=None):
         assert self.model, 'Model was not initialized'
         self.model.fit(x, y, epochs=epochs, batch_size=batch_size, shuffle=True,
+                       verbose=verbose,
                        validation_data=validation,
                        callbacks=callbacks)
         
@@ -183,4 +184,4 @@ class SentimentLSTM(object):
         :return:
         """
         save_load_utils.load_all_weights(self.model, path, include_optimizer=False)
-        print('testing model:', self.model.predict(np.zeros((1, 30))))
+        print('testing model:', self.model.predict(np.zeros((1, 300))))

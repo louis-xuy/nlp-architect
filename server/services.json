@@ -4,5 +4,7 @@
   "spacy_ner" : {"file_name": "spacy_ner_api.py", "type": "high_level", "spacy": true},
   "ner" : {"file_name": "ner_api.py", "type": "high_level"},
   "jieba_pos": {"file_name": "jieba_pos_api.py", "type": "high_level"},
-  "gen": {"file_name": "word_language_api.py", "type": "high_level"}
+  "gen": {"file_name": "word_language_api.py", "type": "high_level"},
+  "sentiment_classify": {"file_name": "sentiment_classify_api.py", "type": "chart"},
+  "word2vec": {"file_name": "np2vec_api.py", "type":"high_level"}
 }
